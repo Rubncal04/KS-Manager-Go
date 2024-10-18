@@ -23,6 +23,7 @@ func StartServer() {
 	})
 
 	e.GET("/churches", handlers.Index(database))
+	e.GET("/churches/:id", handlers.FindOne(database))
 	e.POST("/churches", handlers.Create(database))
 
 	e.Logger.Fatal(e.Start(":1323"))

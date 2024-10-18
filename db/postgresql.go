@@ -48,6 +48,18 @@ func (db *PostgresRepo) FindAllChurches() ([]models.Church, error) {
 	return churches, nil
 }
 
+func (db *PostgresRepo) FindOneChurch(id string) (*models.Church, error) {
+	var church models.Church
+	result := db.db.First(&church, id)
+
+	if result.Error != nil {
+		log.Println(result.Error)
+		return nil, result.Error
+	}
+
+	return &church, nil
+}
+
 func (db *PostgresRepo) CreateChurch(church *models.Church) (*models.Church, error) {
 	result := db.db.Create(&church)
 

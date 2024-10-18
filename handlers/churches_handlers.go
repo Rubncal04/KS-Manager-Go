@@ -77,3 +77,24 @@ func Create(repo *db.PostgresRepo) echo.HandlerFunc {
 		return json.NewEncoder(c.Response()).Encode(res)
 	}
 }
+
+func FindOne(repo *db.PostgresRepo) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id := c.Param("id")
+		result, err := repo.FindOneChurch(id)
+
+		if err != nil {
+			return c.String(http.StatusInternalServerError, "Error fetching church with id: "+id)
+		}
+
+		res := ChurchResponse{
+			ID:      result.ID,
+			Name:    result.Name,
+			Address: result.Address,
+		}
+
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
+		c.Response().WriteHeader(http.StatusOK)
+		return c.JSON(http.StatusOK, res)
+	}
+}
