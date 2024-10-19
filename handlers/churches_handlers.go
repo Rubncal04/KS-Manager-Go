@@ -98,3 +98,34 @@ func FindOne(repo *db.PostgresRepo) echo.HandlerFunc {
 		return c.JSON(http.StatusOK, res)
 	}
 }
+
+func Update(repo *db.PostgresRepo) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		church := new(ChurchRequest)
+		if err := c.Bind(church); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+
+		id := c.Param("id")
+		fields := models.Church{
+			Name:    church.Name,
+			Address: church.Address,
+		}
+
+		result, err := repo.UpdateChurch(id, &fields)
+
+		if err != nil {
+			return c.String(http.StatusInternalServerError, "Error fetching church with id: "+id)
+		}
+
+		res := ChurchResponse{
+			ID:      result.ID,
+			Name:    result.Name,
+			Address: result.Address,
+		}
+
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
+		c.Response().WriteHeader(http.StatusOK)
+		return c.JSON(http.StatusOK, res)
+	}
+}

@@ -70,3 +70,20 @@ func (db *PostgresRepo) CreateChurch(church *models.Church) (*models.Church, err
 
 	return church, nil
 }
+
+func (db *PostgresRepo) UpdateChurch(id string, fields *models.Church) (*models.Church, error) {
+	var update models.Church
+	db.db.First(&update, id)
+
+	if fields.Name != "" {
+		update.Name = fields.Name
+	}
+
+	if fields.Address != "" {
+		update.Address = fields.Address
+	}
+
+	db.db.Save(&update)
+
+	return &update, nil
+}
