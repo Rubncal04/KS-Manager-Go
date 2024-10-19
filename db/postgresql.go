@@ -83,6 +83,18 @@ func (db *PostgresRepo) UpdateChurch(id string, fields *models.Church) (*models.
 		update.Address = fields.Address
 	}
 
+	if fields.CityId != 0 {
+		update.CityId = fields.CityId
+	}
+
+	if fields.CountryId != 0 {
+		update.CountryId = fields.CountryId
+	}
+
+	if fields.StateId != 0 {
+		update.StateId = fields.StateId
+	}
+
 	db.db.Save(&update)
 
 	return &update, nil

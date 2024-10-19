@@ -11,14 +11,20 @@ import (
 
 type (
 	ChurchRequest struct {
-		Name    string `json:"name"`
-		Address string `json:"address"`
+		Name      string `json:"name"`
+		Address   string `json:"address"`
+		CountryId int    `json:"country_id"`
+		StateId   int    `json:"state_id"`
+		CityId    int    `json:"city_id"`
 	}
 
 	ChurchResponse struct {
-		ID      uint   `json:"id"`
-		Name    string `json:"name"`
-		Address string `json:"address"`
+		ID        uint   `json:"id"`
+		CountryId int    `json:"country_id"`
+		StateId   int    `json:"state_id"`
+		CityId    int    `json:"city_id"`
+		Name      string `json:"name"`
+		Address   string `json:"address"`
 	}
 )
 
@@ -34,9 +40,12 @@ func Index(repo *db.PostgresRepo) echo.HandlerFunc {
 
 		for _, row := range result {
 			chur := ChurchResponse{
-				ID:      row.ID,
-				Name:    row.Name,
-				Address: row.Address,
+				ID:        row.ID,
+				Name:      row.Name,
+				Address:   row.Address,
+				CityId:    row.CityId,
+				StateId:   row.StateId,
+				CountryId: row.CountryId,
 			}
 
 			res = append(res, chur)
@@ -56,16 +65,22 @@ func Create(repo *db.PostgresRepo) echo.HandlerFunc {
 		}
 
 		newChurch := models.Church{
-			Name:    church.Name,
-			Address: church.Address,
+			Name:      church.Name,
+			Address:   church.Address,
+			CityId:    church.CityId,
+			StateId:   church.StateId,
+			CountryId: church.CountryId,
 		}
 
 		result, err := repo.CreateChurch(&newChurch)
 
 		res := ChurchResponse{
-			ID:      result.ID,
-			Name:    result.Name,
-			Address: result.Address,
+			ID:        result.ID,
+			Name:      result.Name,
+			Address:   result.Address,
+			CityId:    result.CityId,
+			StateId:   result.StateId,
+			CountryId: result.CountryId,
 		}
 
 		if err != nil {
@@ -88,9 +103,12 @@ func FindOne(repo *db.PostgresRepo) echo.HandlerFunc {
 		}
 
 		res := ChurchResponse{
-			ID:      result.ID,
-			Name:    result.Name,
-			Address: result.Address,
+			ID:        result.ID,
+			Name:      result.Name,
+			Address:   result.Address,
+			CityId:    result.CityId,
+			StateId:   result.StateId,
+			CountryId: result.CountryId,
 		}
 
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
@@ -108,8 +126,11 @@ func Update(repo *db.PostgresRepo) echo.HandlerFunc {
 
 		id := c.Param("id")
 		fields := models.Church{
-			Name:    church.Name,
-			Address: church.Address,
+			Name:      church.Name,
+			Address:   church.Address,
+			CityId:    church.CityId,
+			StateId:   church.StateId,
+			CountryId: church.CountryId,
 		}
 
 		result, err := repo.UpdateChurch(id, &fields)
@@ -119,9 +140,12 @@ func Update(repo *db.PostgresRepo) echo.HandlerFunc {
 		}
 
 		res := ChurchResponse{
-			ID:      result.ID,
-			Name:    result.Name,
-			Address: result.Address,
+			ID:        result.ID,
+			Name:      result.Name,
+			Address:   result.Address,
+			CityId:    result.CityId,
+			StateId:   result.StateId,
+			CountryId: result.CountryId,
 		}
 
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)

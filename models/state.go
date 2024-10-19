@@ -6,14 +6,12 @@ import (
 	"gorm.io/gorm"
 )
 
-type Church struct {
+type State struct {
 	gorm.Model
 	ID        uint
-	CityId    int `gorm:"notnull"`
 	CountryId int `gorm:"notnull"`
-	StateId   int `gorm:"notnull"`
 	Name      string
-	Address   string
+	Cities    []City
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
