@@ -99,3 +99,117 @@ func (db *PostgresRepo) UpdateChurch(id string, fields *models.Church) (*models.
 
 	return &update, nil
 }
+
+func (db *PostgresRepo) FindAllMembers(id string) ([]models.Member, error) {
+	var members []models.Member
+
+	err := db.db.Where("church_id = ?", id).Find(&members).Error
+
+	return members, err
+}
+
+func (db *PostgresRepo) FindOneMember(id string) (*models.Member, error) {
+	var member models.Member
+	result := db.db.First(&member, id)
+
+	if result.Error != nil {
+		log.Println(result.Error)
+		return nil, result.Error
+	}
+
+	return &member, nil
+}
+
+func (db *PostgresRepo) CreateMember(member *models.Member) (*models.Member, error) {
+	result := db.db.Create(&member)
+
+	if result.Error != nil {
+		log.Println(result.Error)
+		return nil, result.Error
+	}
+
+	return member, nil
+}
+
+func (db *PostgresRepo) UpdateMember(id string, fields *models.Member) (*models.Member, error) {
+	var update models.Member
+
+	if err := db.db.First(&update, id).Error; err != nil {
+		return nil, err
+	}
+
+	if fields.Name != "" {
+		update.Name = fields.Name
+	}
+
+	if fields.LastName != "" {
+		update.LastName = fields.LastName
+	}
+
+	if fields.Email != "" {
+		update.Email = fields.Email
+	}
+
+	if fields.IdentificationNumber != "" {
+		update.IdentificationNumber = fields.IdentificationNumber
+	}
+
+	if fields.Address != "" {
+		update.Address = fields.Address
+	}
+
+	if fields.Birthday != "" {
+		update.Birthday = fields.Birthday
+	}
+
+	if fields.BaptizedBy != "" {
+		update.BaptizedBy = fields.BaptizedBy
+	}
+
+	if fields.BaptizedOn != "" {
+		update.BaptizedOn = fields.BaptizedOn
+	}
+
+	if fields.HolySpiritOn != "" {
+		update.HolySpiritOn = fields.HolySpiritOn
+	}
+
+	if fields.Position != "" {
+		update.Position = fields.Position
+	}
+
+	if fields.NumChildren != 0 {
+		update.NumChildren = fields.NumChildren
+	}
+
+	if len(fields.ChildrenNames) > 0 {
+		update.ChildrenNames = fields.ChildrenNames
+	}
+
+	if fields.PartnerName != "" {
+		update.PartnerName = fields.PartnerName
+	}
+
+	if fields.Degree != "" {
+		update.Degree = fields.Degree
+	}
+
+	if fields.Profession != "" {
+		update.Profession = fields.Profession
+	}
+
+	if err := db.db.Save(&update).Error; err != nil {
+		return nil, err
+	}
+
+	return &update, nil
+}
+
+func (db *PostgresRepo) DeleteMember(id string) (string, error) {
+	var member *models.Member
+	if err := db.db.Delete(&member, id).Error; err != nil {
+		return "", err
+	}
+
+	return id, nil
+}

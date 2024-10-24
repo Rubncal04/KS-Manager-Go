@@ -27,5 +27,11 @@ func StartServer() {
 	e.PUT("/churches/:id", handlers.Update(database))
 	e.POST("/churches", handlers.Create(database))
 
+	e.GET("/members/:id", handlers.FindOneMember(database))
+	e.PUT("/members/:id", handlers.UpdateMember(database))
+	e.DELETE("/members/:id", handlers.DeleteMember(database))
+	e.GET("/members/churches/:church_id", handlers.IndexMembers(database))
+	e.POST("/members/churches/:church_id", handlers.CreateMember(database))
+
 	e.Logger.Fatal(e.Start(":1323"))
 }

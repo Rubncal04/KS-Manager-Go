@@ -12,6 +12,7 @@ type Church struct {
 	CityId    int `gorm:"notnull"`
 	CountryId int `gorm:"notnull"`
 	StateId   int `gorm:"notnull"`
+	Members   []Member
 	Name      string
 	Address   string
 	CreatedAt time.Time
