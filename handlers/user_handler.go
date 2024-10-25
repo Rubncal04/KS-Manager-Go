@@ -39,7 +39,13 @@ func Register(repo *db.PostgresRepo) echo.HandlerFunc {
 		}
 
 		if newUser.Password != newUser.ConfirmPassword {
-			return echo.NewHTTPError(http.StatusBadRequest, "Mismatch passwords")
+			errorRes := SimpleReponse{
+				Message: "Passwords do not match",
+				Code:    400,
+			}
+
+			c.Response().WriteHeader(http.StatusBadRequest)
+			return json.NewEncoder(c.Response()).Encode(errorRes)
 		}
 
 		user := models.User{
@@ -58,6 +64,8 @@ func Register(repo *db.PostgresRepo) echo.HandlerFunc {
 				Code:    500,
 			}
 			log.Println(err)
+
+			c.Response().WriteHeader(http.StatusInternalServerError)
 			return json.NewEncoder(c.Response()).Encode(errorRes)
 		}
 
@@ -69,6 +77,8 @@ func Register(repo *db.PostgresRepo) echo.HandlerFunc {
 				Code:    500,
 			}
 			log.Println(er)
+
+			c.Response().WriteHeader(http.StatusInternalServerError)
 			return json.NewEncoder(c.Response()).Encode(errorRes)
 		}
 
@@ -88,7 +98,13 @@ func Login(repo *db.PostgresRepo) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user := new(LoginRequest)
 		if err := c.Bind(user); err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+			errorRes := SimpleReponse{
+				Message: "There're some required fields",
+				Code:    400,
+			}
+
+			c.Response().WriteHeader(http.StatusBadRequest)
+			return json.NewEncoder(c.Response()).Encode(errorRes)
 		}
 
 		userReq := models.User{
@@ -103,17 +119,21 @@ func Login(repo *db.PostgresRepo) echo.HandlerFunc {
 				Code:    500,
 			}
 			log.Println(err)
+
+			c.Response().WriteHeader(http.StatusInternalServerError)
 			return json.NewEncoder(c.Response()).Encode(errorRes)
 		}
 
 		confirm := models.CheckPasswordHash(user.Password, loggedUser.Password)
 
-		if confirm == false {
+		if !confirm {
 			errorRes := SimpleReponse{
 				Message: "Your password is incorrect",
 				Code:    401,
 			}
 			log.Println(err)
+
+			c.Response().WriteHeader(http.StatusBadRequest)
 			return json.NewEncoder(c.Response()).Encode(errorRes)
 		}
 

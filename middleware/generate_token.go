@@ -12,6 +12,7 @@ type JWTClaims struct {
 	UserID   uint   `json:"user_id"`
 	Name     string `json:"name"`
 	UserName string `json:"user_name"`
+	ChurchId int    `json:"church_id"`
 	Role     int    `json:"role"`
 	jwt.RegisteredClaims
 }
@@ -25,6 +26,7 @@ func GenerateJWT(user *models.User) (string, error) {
 		UserID:   user.ID,
 		UserName: user.UserName,
 		Name:     user.Name,
+		ChurchId: user.ChurchId,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},

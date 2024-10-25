@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/Rubncal04/ksmanager/db"
+	"github.com/Rubncal04/ksmanager/middleware"
 	"github.com/Rubncal04/ksmanager/models"
 	"github.com/labstack/echo/v4"
 )
@@ -56,7 +56,8 @@ type SimpleReponse struct {
 
 func IndexMembers(repo *db.PostgresRepo) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		id := c.Param("church_id")
+		user := middleware.Authentication(c)
+		id := fmt.Sprintf("%d", user.ChurchId)
 		result, err := repo.FindAllMembers(id)
 
 		if err != nil {
@@ -64,6 +65,8 @@ func IndexMembers(repo *db.PostgresRepo) echo.HandlerFunc {
 				Message: "Error fetching members",
 				Code:    500,
 			}
+
+			c.Response().WriteHeader(http.StatusInternalServerError)
 			return json.NewEncoder(c.Response()).Encode(errorRes)
 		}
 
@@ -93,7 +96,7 @@ func IndexMembers(repo *db.PostgresRepo) echo.HandlerFunc {
 			members = append(members, mem)
 		}
 
-		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		c.Response().WriteHeader(http.StatusOK)
 		return c.JSON(http.StatusOK, members)
 	}
@@ -109,6 +112,8 @@ func FindOneMember(repo *db.PostgresRepo) echo.HandlerFunc {
 				Message: "There was an error finding member",
 				Code:    500,
 			}
+
+			c.Response().WriteHeader(http.StatusInternalServerError)
 			return json.NewEncoder(c.Response()).Encode(errorRes)
 		}
 
@@ -132,7 +137,7 @@ func FindOneMember(repo *db.PostgresRepo) echo.HandlerFunc {
 			ChildrenNames:        result.ChildrenNames,
 		}
 
-		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		c.Response().WriteHeader(http.StatusOK)
 		return json.NewEncoder(c.Response()).Encode(res)
 	}
@@ -141,10 +146,17 @@ func FindOneMember(repo *db.PostgresRepo) echo.HandlerFunc {
 func CreateMember(repo *db.PostgresRepo) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		member := new(MemberRequest)
-		id := c.Param("church_id")
-		churchId, _ := strconv.Atoi(id)
+		user := middleware.Authentication(c)
+		churchId := user.ChurchId
+
 		if err := c.Bind(member); err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+			errorRes := SimpleReponse{
+				Message: "There're some required fields.",
+				Code:    400,
+			}
+
+			c.Response().WriteHeader(http.StatusBadRequest)
+			return json.NewEncoder(c.Response()).Encode(errorRes)
 		}
 
 		newMember := models.Member{
@@ -173,6 +185,8 @@ func CreateMember(repo *db.PostgresRepo) echo.HandlerFunc {
 				Message: "Error create member",
 				Code:    500,
 			}
+
+			c.Response().WriteHeader(http.StatusInternalServerError)
 			return json.NewEncoder(c.Response()).Encode(errorRes)
 		}
 
@@ -196,7 +210,7 @@ func CreateMember(repo *db.PostgresRepo) echo.HandlerFunc {
 			ChildrenNames:        result.ChildrenNames,
 		}
 
-		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		c.Response().WriteHeader(http.StatusOK)
 		return json.NewEncoder(c.Response()).Encode(res)
 	}
@@ -207,7 +221,13 @@ func UpdateMember(repo *db.PostgresRepo) echo.HandlerFunc {
 		member := new(MemberRequest)
 		id := c.Param("id")
 		if err := c.Bind(member); err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+			errorRes := SimpleReponse{
+				Message: "There're required fields.",
+				Code:    400,
+			}
+
+			c.Response().WriteHeader(http.StatusBadRequest)
+			return json.NewEncoder(c.Response()).Encode(errorRes)
 		}
 
 		fields := models.Member{
@@ -235,6 +255,8 @@ func UpdateMember(repo *db.PostgresRepo) echo.HandlerFunc {
 				Message: "Error update member",
 				Code:    500,
 			}
+
+			c.Response().WriteHeader(http.StatusInternalServerError)
 			return json.NewEncoder(c.Response()).Encode(errorRes)
 		}
 
@@ -258,7 +280,7 @@ func UpdateMember(repo *db.PostgresRepo) echo.HandlerFunc {
 			ChildrenNames:        result.ChildrenNames,
 		}
 
-		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		c.Response().WriteHeader(http.StatusOK)
 		return json.NewEncoder(c.Response()).Encode(res)
 	}
@@ -275,6 +297,8 @@ func DeleteMember(repo *db.PostgresRepo) echo.HandlerFunc {
 				Message: "Error deleting member",
 				Code:    500,
 			}
+
+			c.Response().WriteHeader(http.StatusInternalServerError)
 			return json.NewEncoder(c.Response()).Encode(errorRes)
 		}
 
@@ -283,7 +307,7 @@ func DeleteMember(repo *db.PostgresRepo) echo.HandlerFunc {
 			Code:    202,
 		}
 
-		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		c.Response().WriteHeader(http.StatusOK)
 		return json.NewEncoder(c.Response()).Encode(res)
 	}
