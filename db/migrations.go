@@ -8,4 +8,5 @@ func RunMigrations(db PostgresRepo) {
 	db.db.AutoMigrate(models.City{})
 	db.db.AutoMigrate(models.Church{})
 	db.db.AutoMigrate(models.Member{})
+	db.db.AutoMigrate(models.User{})
 }

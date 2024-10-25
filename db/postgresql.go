@@ -15,8 +15,7 @@ type PostgresRepo struct {
 	db *gorm.DB
 }
 
-func NewPostgresRepo() (*PostgresRepo, error) {
-	var variables = config.GetVariables()
+func NewPostgresRepo(variables *config.EnvVariables) (*PostgresRepo, error) {
 	dsn := fmt.Sprintf("host=%v user=%v password=%v dbname=%v port=%v sslmode=%v TimeZone=%v",
 		variables.DB_HOST, variables.DB_USER, variables.DB_PASSWORD, variables.DB_NAME, variables.DB_PORT,
 		variables.SSL_MODE, variables.TIME_ZONE,
@@ -212,4 +211,26 @@ func (db *PostgresRepo) DeleteMember(id string) (string, error) {
 	}
 
 	return id, nil
+}
+
+func (db *PostgresRepo) CreateUser(user *models.User) (*models.User, error) {
+	newUser := db.db.Create(&user)
+
+	if newUser.Error != nil {
+		log.Println(newUser.Error)
+		return nil, newUser.Error
+	}
+
+	return user, nil
+}
+
+func (db *PostgresRepo) FindUser(user *models.User) (*models.User, error) {
+	result := db.db.First(&user)
+
+	if result.Error != nil {
+		log.Println(result.Error)
+		return nil, result.Error
+	}
+
+	return user, nil
 }
