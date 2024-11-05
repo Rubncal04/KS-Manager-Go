@@ -48,12 +48,26 @@ func Register(repo *db.PostgresRepo) echo.HandlerFunc {
 			return json.NewEncoder(c.Response()).Encode(errorRes)
 		}
 
+		role, err := repo.FindRoleByName("assistant")
+
+		if err != nil {
+			errorRes := SimpleReponse{
+				Message: "Error finding role for this user",
+				Code:    500,
+			}
+			log.Println(err)
+
+			c.Response().WriteHeader(http.StatusInternalServerError)
+			return json.NewEncoder(c.Response()).Encode(errorRes)
+		}
+
 		user := models.User{
 			Name:     newUser.Name,
 			Email:    newUser.Email,
 			UserName: newUser.UserName,
 			ChurchId: newUser.ChurchId,
 			Password: newUser.Password,
+			RoleId:   int(role.ID),
 		}
 
 		result, err := repo.CreateUser(&user)
@@ -69,7 +83,7 @@ func Register(repo *db.PostgresRepo) echo.HandlerFunc {
 			return json.NewEncoder(c.Response()).Encode(errorRes)
 		}
 
-		token, er := middleware.GenerateJWT(result)
+		token, er := middleware.GenerateJWT(result, *repo)
 
 		if er != nil {
 			errorRes := SimpleReponse{
@@ -111,7 +125,7 @@ func Login(repo *db.PostgresRepo) echo.HandlerFunc {
 			UserName: user.UserName,
 		}
 
-		loggedUser, err := repo.FindUser(&userReq)
+		loggedUser, err := repo.FindUserBy(&userReq, userReq.UserName, "user_name")
 
 		if err != nil {
 			errorRes := SimpleReponse{
@@ -137,7 +151,7 @@ func Login(repo *db.PostgresRepo) echo.HandlerFunc {
 			return json.NewEncoder(c.Response()).Encode(errorRes)
 		}
 
-		token, er := middleware.GenerateJWT(loggedUser)
+		token, er := middleware.GenerateJWT(loggedUser, *repo)
 
 		if er != nil {
 			errorRes := SimpleReponse{

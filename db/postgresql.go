@@ -234,3 +234,73 @@ func (db *PostgresRepo) FindUser(user *models.User) (*models.User, error) {
 
 	return user, nil
 }
+
+func (db *PostgresRepo) FindUserBy(user *models.User, field, property string) (*models.User, error) {
+	result := db.db.Where(property+" = ?", field).First(&user)
+
+	if result.Error != nil {
+		log.Println(result.Error)
+		return nil, result.Error
+	}
+
+	return user, nil
+}
+
+func (db *PostgresRepo) CreateRole(role *models.Role) (*models.Role, error) {
+	newRole := db.db.Create(&role)
+
+	if newRole.Error != nil {
+		log.Println(newRole.Error)
+		return nil, newRole.Error
+	}
+
+	return role, nil
+}
+
+func (db *PostgresRepo) FindAllRoles() ([]models.Role, error) {
+	var roles []models.Role
+
+	result := db.db.Find(&roles)
+
+	if result.Error != nil {
+		log.Println(result.Error)
+		return nil, result.Error
+	}
+
+	return roles, nil
+}
+
+func (db *PostgresRepo) FindOneRoleById(id string) (*models.Role, error) {
+	var role models.Role
+
+	result := db.db.First(&role, id)
+
+	if result.Error != nil {
+		log.Println(result.Error)
+		return nil, result.Error
+	}
+
+	return &role, nil
+}
+
+func (db *PostgresRepo) FindRoleByName(name string) (*models.Role, error) {
+	var role models.Role
+
+	err := db.db.Where("name = ?", name).First(&role)
+	if err.Error != nil {
+		log.Println(err.Error)
+		return nil, err.Error
+	}
+
+	return &role, nil
+}
+
+func (db *PostgresRepo) DeleteRole(id string) (string, error) {
+	var role *models.Role
+
+	if err := db.db.Delete(&role, id).Error; err != nil {
+		return "", err
+	}
+
+	return id, nil
+}

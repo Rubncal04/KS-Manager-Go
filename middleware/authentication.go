@@ -14,7 +14,7 @@ func Authentication(c echo.Context) *JWTClaims {
 		Name:     claims["name"].(string),
 		UserName: claims["user_name"].(string),
 		ChurchId: int(claims["church_id"].(float64)),
-		Role:     int(claims["role"].(float64)),
+		Role:     claims["role"].(string),
 	}
 
 	return &jwtClaims

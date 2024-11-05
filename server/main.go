@@ -7,9 +7,18 @@ import (
 	"github.com/Rubncal04/ksmanager/config"
 	"github.com/Rubncal04/ksmanager/db"
 	"github.com/Rubncal04/ksmanager/handlers"
+	"github.com/Rubncal04/ksmanager/middleware"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	echoMidd "github.com/labstack/echo/v4/middleware"
+)
+
+const (
+	RoleRoot      = "root"
+	RolePastor    = "pastor"
+	RoleSecretary = "secretary"
+	RoleTreasurer = "treasurer"
+	RoleAssistant = "assistant"
 )
 
 func StartServer() {
@@ -40,17 +49,22 @@ func StartServer() {
 	}))
 
 	// Church endpoints
-	private.GET("/churches", handlers.Index(database))
-	private.GET("/churches/:id", handlers.FindOne(database))
-	private.PUT("/churches/:id", handlers.Update(database))
-	private.POST("/churches", handlers.Create(database))
+	private.GET("/churches", handlers.Index(database), middleware.Authorization(RoleRoot, RolePastor, RoleSecretary, RoleTreasurer))
+	private.GET("/churches/:id", handlers.FindOne(database), middleware.Authorization(RoleRoot, RolePastor, RoleSecretary, RoleTreasurer))
+	private.PUT("/churches/:id", handlers.Update(database), middleware.Authorization(RoleRoot, RolePastor))
+	private.POST("/churches", handlers.Create(database), middleware.Authorization(RoleRoot, RolePastor))
 
 	// Member endpoints
-	private.GET("/members/:id", handlers.FindOneMember(database))
-	private.PUT("/members/:id", handlers.UpdateMember(database))
-	private.DELETE("/members/:id", handlers.DeleteMember(database))
-	private.GET("/members/churches/:church_id", handlers.IndexMembers(database))
-	private.POST("/members/churches/:church_id", handlers.CreateMember(database))
+	private.GET("/members/:id", handlers.FindOneMember(database), middleware.Authorization(RoleRoot, RolePastor, RoleSecretary, RoleAssistant))
+	private.PUT("/members/:id", handlers.UpdateMember(database), middleware.Authorization(RoleRoot, RolePastor, RoleSecretary))
+	private.DELETE("/members/:id", handlers.DeleteMember(database), middleware.Authorization(RoleRoot, RolePastor, RoleSecretary))
+	private.GET("/members/churches/:church_id", handlers.IndexMembers(database), middleware.Authorization(RoleRoot, RolePastor, RoleSecretary, RoleAssistant))
+	private.POST("/members/churches/:church_id", handlers.CreateMember(database), middleware.Authorization(RoleRoot, RolePastor, RoleSecretary))
+
+	// Roles endpoints
+	private.GET("/roles", handlers.GetAllRoles(database), middleware.Authorization(RoleRoot, RolePastor))
+	private.POST("/roles", handlers.CreateRole(database), middleware.Authorization(RoleRoot))
+	private.DELETE("/roles/:id", handlers.DeleteRole(database), middleware.Authorization(RoleRoot))
 
 	e.Logger.Fatal(e.Start(port))
 }

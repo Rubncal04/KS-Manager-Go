@@ -9,7 +9,9 @@ import (
 
 type User struct {
 	gorm.Model
-	ChurchId  int    `gorm:"notnull"`
+	ChurchId  int `gorm:"notnull"`
+	RoleId    int
+	Role      Role   `gorm:"foreignKey:RoleId"`
 	Name      string `gorm:"type:varchar(255)"`
 	Email     string `gorm:"uniqueIndex;type:varchar(255)"`
 	UserName  string `gorm:"uniqueIndex;type:varchar(255);notnull"`
