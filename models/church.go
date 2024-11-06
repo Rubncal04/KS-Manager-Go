@@ -8,14 +8,15 @@ import (
 
 type Church struct {
 	gorm.Model
-	ID        uint
-	CityId    int `gorm:"notnull"`
-	CountryId int `gorm:"notnull"`
-	StateId   int `gorm:"notnull"`
-	Members   []Member
-	Users     []User
-	Name      string
-	Address   string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID              uint
+	CityId          int `gorm:"notnull"`
+	CountryId       int `gorm:"notnull"`
+	StateId         int `gorm:"notnull"`
+	Members         []Member
+	Users           []User
+	WorshipServices []WorshipService
+	Name            string
+	Address         string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
 }

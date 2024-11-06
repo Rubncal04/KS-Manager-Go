@@ -304,3 +304,72 @@ func (db *PostgresRepo) DeleteRole(id string) (string, error) {
 
 	return id, nil
 }
+
+func (db *PostgresRepo) CreateWorshipService(wService *models.WorshipService) (*models.WorshipService, error) {
+	result := db.db.Create(&wService)
+
+	if result.Error != nil {
+		log.Println(result.Error)
+		return nil, result.Error
+	}
+
+	return wService, nil
+}
+
+func (db *PostgresRepo) FindAllWorship(id string) ([]models.WorshipService, error) {
+	var worship []models.WorshipService
+
+	err := db.db.Where("church_id = ?", id).Find(&worship).Error
+
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return worship, err
+}
+
+func (db *PostgresRepo) UpdateWorship(id string, fields *models.WorshipService) (*models.WorshipService, error) {
+	var update models.WorshipService
+
+	if err := db.db.First(&update, id).Error; err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	if fields.Name != "" {
+		update.Name = fields.Name
+	}
+
+	if fields.Day != "" {
+		update.Day = fields.Day
+	}
+
+	if err := db.db.Save(&update).Error; err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return &update, nil
+}
+
+func (db *PostgresRepo) DeleteWorship(id string) (string, error) {
+	var worship models.WorshipService
+
+	if err := db.db.Delete(&worship, id).Error; err != nil {
+		return "", err
+	}
+
+	return id, nil
+}
+
+func (db *PostgresRepo) FindWorshipByID(id string) (*models.WorshipService, error) {
+	var worship models.WorshipService
+
+	if err := db.db.First(&worship, id).Error; err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return &worship, nil
+}
