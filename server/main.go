@@ -73,5 +73,13 @@ func StartServer() {
 	private.PUT("/worship-services/:id", handlers.UpdateWorshipService(database), middleware.Authorization(RoleRoot, RolePastor, RoleSecretary))
 	private.DELETE("/worship-services/:id", handlers.DeleteWorshipService(database), middleware.Authorization(RoleRoot, RolePastor, RoleSecretary))
 
+	// Categories endpoints
+	private.GET("/categories", handlers.FindAllCategory(database), middleware.Authorization(RoleRoot, RolePastor, RoleTreasurer))
+	private.POST("/categories", handlers.CreateCategory(database), middleware.Authorization(RoleRoot, RolePastor, RoleTreasurer))
+
+	// Offerings endpoints
+	private.GET("/worship-services/:worship_id/offerings", handlers.FindAllOffering(database), middleware.Authorization(RoleRoot, RolePastor, RoleTreasurer))
+	private.POST("/worship-services/:worship_id/offerings", handlers.CreateOffering(database), middleware.Authorization(RoleRoot, RolePastor, RoleTreasurer))
+
 	e.Logger.Fatal(e.Start(port))
 }

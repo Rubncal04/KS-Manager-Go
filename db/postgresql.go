@@ -373,3 +373,73 @@ func (db *PostgresRepo) FindWorshipByID(id string) (*models.WorshipService, erro
 
 	return &worship, nil
 }
+
+func (db *PostgresRepo) CreateCategory(category *models.Category) (*models.Category, error) {
+	err := db.db.Create(&category).Error
+
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return category, nil
+}
+
+func (db *PostgresRepo) FindAllCategory() ([]models.Category, error) {
+	var categories []models.Category
+	err := db.db.Find(&categories).Error
+
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return categories, nil
+}
+
+func (db *PostgresRepo) CreateOffering(offering *models.Offering) (*models.Offering, error) {
+	err := db.db.Create(&offering).Error
+
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return offering, nil
+}
+
+func (db *PostgresRepo) FindAllOffering(worshipId, churchId string) ([]models.Offering, error) {
+	var offers []models.Offering
+	err := db.db.Where("worship_service_id = ? and church_id = ?", worshipId, churchId).Find(&offers).Error
+
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return offers, nil
+}
+
+func (db *PostgresRepo) FindOfferingById(id string) (*models.Offering, error) {
+	var offering models.Offering
+	err := db.db.Find(&offering, id).Error
+
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return &offering, nil
+}
+
+func (db *PostgresRepo) DeleteOffering(id string) (string, error) {
+	var offering models.Offering
+	err := db.db.Delete(&offering, id).Error
+
+	if err != nil {
+		log.Println(err)
+		return "", err
+	}
+
+	return id, nil
+}
