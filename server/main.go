@@ -3,6 +3,9 @@ package server
 import (
 	"log"
 	"net/http"
+	"text/template"
+
+	temp "github.com/Rubncal04/ksmanager/templates"
 
 	"github.com/Rubncal04/ksmanager/config"
 	"github.com/Rubncal04/ksmanager/db"
@@ -32,11 +35,18 @@ func StartServer() {
 		log.Println(err.Error())
 	}
 
+	renderer := &temp.TemplateRenderer{
+		Templates: template.Must(template.ParseGlob("templates/*.html")),
+	}
+
 	e.Use(echoMidd.Logger())
 	e.Use(echoMidd.Recover())
 
+	e.Renderer = renderer
+	e.Static("/assets", "assets")
+
 	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
+		return c.Render(http.StatusOK, "login.html", nil)
 	})
 
 	// User enpoints
