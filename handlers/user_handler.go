@@ -9,6 +9,7 @@ import (
 	"github.com/Rubncal04/ksmanager/db"
 	"github.com/Rubncal04/ksmanager/middleware"
 	"github.com/Rubncal04/ksmanager/models"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 )
 
@@ -112,7 +113,9 @@ func Register(repo *db.PostgresRepo) echo.HandlerFunc {
 func Login(repo *db.PostgresRepo) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		acceptHeader := c.Request().Header.Get(echo.HeaderAccept)
+		sess, _ := session.Get("user-info", c)
 		user := new(LoginRequest)
+
 		if err := c.Bind(user); err != nil {
 			errorRes := SimpleReponse{
 				Message: "There're some required fields",
@@ -185,12 +188,37 @@ func Login(repo *db.PostgresRepo) echo.HandlerFunc {
 		}
 
 		if acceptHeader == "" || strings.Contains(acceptHeader, echo.MIMETextHTML) {
-			log.Println("Accept header html")
-			return c.Render(http.StatusOK, "user.html", res)
+			userData, err := json.Marshal(res)
+			if err != nil {
+				log.Println("Error serializing user data:", err)
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to serialize user data"})
+			}
+			sess.Values["user"] = string(userData)
+			sess.Save(c.Request(), c.Response())
+			return c.Redirect(http.StatusSeeOther, "/user")
 		}
 
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		c.Response().WriteHeader(http.StatusOK)
 		return json.NewEncoder(c.Response()).Encode(res)
+	}
+}
+
+func ShowUser() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		sess, _ := session.Get("user-info", c)
+
+		userData, ok := sess.Values["user"].(string)
+		if !ok || userData == "" {
+			return c.Redirect(http.StatusSeeOther, "/")
+		}
+
+		var userRes UserReponse
+		if err := json.Unmarshal([]byte(userData), &userRes); err != nil {
+			log.Println("Error deserializing user data:", err)
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to deserialize user data"})
+		}
+
+		return c.Render(http.StatusOK, "base.html", userRes)
 	}
 }

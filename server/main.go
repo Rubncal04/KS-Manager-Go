@@ -2,7 +2,6 @@ package server
 
 import (
 	"log"
-	"net/http"
 	"text/template"
 
 	temp "github.com/Rubncal04/ksmanager/templates"
@@ -11,6 +10,8 @@ import (
 	"github.com/Rubncal04/ksmanager/db"
 	"github.com/Rubncal04/ksmanager/handlers"
 	"github.com/Rubncal04/ksmanager/middleware"
+	"github.com/gorilla/sessions"
+	"github.com/labstack/echo-contrib/session"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	echoMidd "github.com/labstack/echo/v4/middleware"
@@ -41,13 +42,16 @@ func StartServer() {
 
 	e.Use(echoMidd.Logger())
 	e.Use(echoMidd.Recover())
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte(envVariables.SESSION_KEY))))
 
 	e.Renderer = renderer
 	e.Static("/assets", "assets")
 
-	e.GET("/", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "login.html", nil)
-	})
+	e.GET("/", handlers.Welcome())
+
+	// Views
+	e.GET("/user", handlers.ShowUser())
+	e.GET("/church", handlers.ShowChurch())
 
 	// User enpoints
 	e.POST("/register", handlers.Register(database))

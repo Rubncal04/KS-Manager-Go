@@ -18,6 +18,7 @@ type EnvVariables struct {
 	TIME_ZONE   string
 	DB_NAME     string
 	JWT_KEY     string
+	SESSION_KEY string
 }
 
 func GetVariables() *EnvVariables {
@@ -37,5 +38,6 @@ func GetVariables() *EnvVariables {
 		TIME_ZONE:   os.Getenv("TIME_ZONE"),
 		DB_NAME:     os.Getenv("DB_NAME"),
 		JWT_KEY:     os.Getenv("JWT_KEY"),
+		SESSION_KEY: os.Getenv("SESSION_KEY"),
 	}
 }
