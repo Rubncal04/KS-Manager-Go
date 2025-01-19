@@ -1,0 +1,35 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    env_file: ".env"
+    environment:
+      - PORT=${PORT}
+      - JWT_KEY=${JWT_KEY}
+      - SESSION_KEY=${SESSION_KEY}
+    ports:
+      - "1323:1323"
+    volumes:
+      - .:/go/src/ksmanager
+      - /go/src/ksmanager/tmp
+
+  db:
+    image: postgres:17
+    env_file: ".env"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    environment:
+       - POSTGRES_HOST=${DB_HOST}
+       - POSTGRES_USER=${DB_USER}
+       - POSTGRES_PASSWORD=${DB_PASSWORD}
+       - POSTGRES_PORT=${DB_PORT}
+       - SSL_MODE=${SSL_MODE}
+       - TIME_ZONE=${TIME_ZONE}
+       - DB_NAME=${DB_NAME}
+    ports:
+     - "5432:5432"
+volumes:
+  dbdata:
