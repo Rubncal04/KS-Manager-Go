@@ -24,21 +24,21 @@ func RunMigrations(db PostgresRepo) {
 }
 
 func addRoleIDToUsers(db PostgresRepo, role models.Role) error {
-	db.db.Model(&models.User{}).Where("role_id IS NULL").Update("role_id", role.ID)
+	if role.ID != 0 {
+		db.db.Model(&models.User{}).Where("role_id IS NULL").Update("role_id", role.ID)
 
-	return db.db.Exec("ALTER TABLE users ALTER COLUMN role_id SET NOT NULL").Error
+		return db.db.Exec("ALTER TABLE users ALTER COLUMN role_id SET NOT NULL").Error
+	}
+
+	return nil
 }
 
 func createRootRole(db PostgresRepo) *models.Role {
 	role := models.Role{}
 	existsRole := db.db.Where("name = ?", "root").First(&role)
-	if existsRole.Error != nil {
-		log.Println(existsRole.Error)
-		return nil
-	}
 
-	if existsRole != nil && errors.Is(existsRole.Error, gorm.ErrRecordNotFound) {
-		user := models.Role{
+	if errors.Is(existsRole.Error, gorm.ErrRecordNotFound) {
+		role = models.Role{
 			Name: "root",
 			Permissions: models.Permissions{
 				CreateUser:   true,
@@ -60,8 +60,11 @@ func createRootRole(db PostgresRepo) *models.Role {
 			},
 		}
 
-		db.CreateRole(&user)
-		return &user
+		db.CreateRole(&role)
+		if _, err := db.CreateRole(&role); err != nil {
+			log.Fatalf("Failed to create root role: %v", err)
+			return nil
+		}
 	}
 
 	return &role
