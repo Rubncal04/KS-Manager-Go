@@ -10,22 +10,26 @@ import (
 )
 
 type Permissions struct {
-	CreateUser   bool `json:"create_user"`
-	UpdateUser   bool `json:"update_user"`
-	DeleteUser   bool `json:"delete_user"`
-	GetUser      bool `json:"get_user"`
-	CreateMember bool `json:"create_member"`
-	UpdateMember bool `json:"update_member"`
-	DeleteMember bool `json:"delete_member"`
-	GetMember    bool `json:"get_member"`
-	CreateChurch bool `json:"create_church"`
-	UpdateChurch bool `json:"update_church"`
-	DeleteChurch bool `json:"delete_church"`
-	GetChurch    bool `json:"get_church"`
-	CreateRole   bool `json:"create_role"`
-	UpdateRole   bool `json:"update_role"`
-	DeleteRole   bool `json:"delete_role"`
-	GetRoles     bool `json:"get_roles"`
+	CreateUser     bool `json:"create_user"`
+	UpdateUser     bool `json:"update_user"`
+	DeleteUser     bool `json:"delete_user"`
+	GetUser        bool `json:"get_user"`
+	CreateMember   bool `json:"create_member"`
+	UpdateMember   bool `json:"update_member"`
+	DeleteMember   bool `json:"delete_member"`
+	GetMember      bool `json:"get_member"`
+	CreateChurch   bool `json:"create_church"`
+	UpdateChurch   bool `json:"update_church"`
+	DeleteChurch   bool `json:"delete_church"`
+	GetChurch      bool `json:"get_church"`
+	CreateRole     bool `json:"create_role"`
+	UpdateRole     bool `json:"update_role"`
+	DeleteRole     bool `json:"delete_role"`
+	GetRoles       bool `json:"get_roles"`
+	CreateOffering bool `json:"create_offering"`
+	UpdateOffering bool `json:"update_offering"`
+	DeleteOffering bool `json:"delete_offering"`
+	GetOffering    bool `json:"get_offering"`
 }
 
 func (p Permissions) Value() (driver.Value, error) {

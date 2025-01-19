@@ -18,6 +18,7 @@ func RunMigrations(db PostgresRepo) {
 	db.db.AutoMigrate(models.User{})
 	role := createRootRole(db)
 	addRoleIDToUsers(db, *role)
+	Seeders(db)
 	db.db.AutoMigrate(models.WorshipService{})
 	db.db.AutoMigrate(models.Category{})
 	db.db.AutoMigrate(models.Offering{})
