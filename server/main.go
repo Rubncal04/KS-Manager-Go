@@ -31,10 +31,14 @@ func StartServer() {
 	port := envVariables.PORT
 
 	database, err := db.NewPostgresRepo(envVariables)
-	db.RunMigrations(*database)
+
 	if err != nil {
 		log.Println(err.Error())
 	}
+
+	db.RunMigrations(*database)
+
+	cache := db.StartCacheDb(envVariables)
 
 	renderer := &temp.TemplateRenderer{
 		Templates: template.Must(template.ParseGlob("templates/*.html")),
@@ -61,6 +65,7 @@ func StartServer() {
 	private.Use(echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(envVariables.JWT_KEY),
 	}))
+	private.Use(handlers.NewCache(cache))
 
 	// Church endpoints
 	private.GET("/churches", handlers.Index(database), middleware.Authorization(RoleRoot, RolePastor, RoleSecretary, RoleTreasurer))

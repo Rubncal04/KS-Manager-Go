@@ -8,17 +8,21 @@ import (
 )
 
 type EnvVariables struct {
-	DatabaseUrl string
-	PORT        string
-	DB_HOST     string
-	DB_USER     string
-	DB_PASSWORD string
-	DB_PORT     string
-	SSL_MODE    string
-	TIME_ZONE   string
-	DB_NAME     string
-	JWT_KEY     string
-	SESSION_KEY string
+	DatabaseUrl     string
+	PORT            string
+	DB_HOST         string
+	DB_USER         string
+	DB_PASSWORD     string
+	DB_PORT         string
+	SSL_MODE        string
+	TIME_ZONE       string
+	DB_NAME         string
+	JWT_KEY         string
+	SESSION_KEY     string
+	REDIS_ADDRESS   string
+	REDIS_PASSWORD  string
+	REDIS_PORT      string
+	REDIS_DATABASES string
 }
 
 func GetVariables() *EnvVariables {
@@ -28,16 +32,20 @@ func GetVariables() *EnvVariables {
 	}
 
 	return &EnvVariables{
-		DatabaseUrl: os.Getenv("DATABASE_URL"),
-		PORT:        os.Getenv("PORT"),
-		DB_HOST:     os.Getenv("DB_HOST"),
-		DB_USER:     os.Getenv("DB_USER"),
-		DB_PASSWORD: os.Getenv("DB_PASSWORD"),
-		DB_PORT:     os.Getenv("DB_PORT"),
-		SSL_MODE:    os.Getenv("SSL_MODE"),
-		TIME_ZONE:   os.Getenv("TIME_ZONE"),
-		DB_NAME:     os.Getenv("DB_NAME"),
-		JWT_KEY:     os.Getenv("JWT_KEY"),
-		SESSION_KEY: os.Getenv("SESSION_KEY"),
+		DatabaseUrl:     os.Getenv("DATABASE_URL"),
+		PORT:            os.Getenv("PORT"),
+		DB_HOST:         os.Getenv("DB_HOST"),
+		DB_USER:         os.Getenv("DB_USER"),
+		DB_PASSWORD:     os.Getenv("DB_PASSWORD"),
+		DB_PORT:         os.Getenv("DB_PORT"),
+		SSL_MODE:        os.Getenv("SSL_MODE"),
+		TIME_ZONE:       os.Getenv("TIME_ZONE"),
+		DB_NAME:         os.Getenv("DB_NAME"),
+		JWT_KEY:         os.Getenv("JWT_KEY"),
+		SESSION_KEY:     os.Getenv("SESSION_KEY"),
+		REDIS_ADDRESS:   os.Getenv("REDIS_ADDRESS"),
+		REDIS_PASSWORD:  os.Getenv("REDIS_PASSWORD"),
+		REDIS_PORT:      os.Getenv("REDIS_PORT"),
+		REDIS_DATABASES: os.Getenv("REDIS_DATABASES"),
 	}
 }

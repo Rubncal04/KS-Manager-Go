@@ -214,6 +214,7 @@ func CountrySeed(db PostgresRepo) {
 	err := db.db.Where("name = ?", "Colombia").First(&existingCountry).Error
 	if err == nil {
 		fmt.Printf("Skipping country '%s' already exists.\n", country.Name)
+		return
 	}
 
 	if err != gorm.ErrRecordNotFound {
@@ -243,6 +244,7 @@ func StateSeed(db PostgresRepo) {
 	err = db.db.Where("name = ?", "Atlantico").First(&state).Error
 	if err == nil {
 		fmt.Printf("Skipping state '%s' already exists.\n", state.Name)
+		return
 	}
 
 	if err != gorm.ErrRecordNotFound {
@@ -272,6 +274,7 @@ func CitySeed(db PostgresRepo) {
 	err = db.db.Where("name = ?", "Barranquilla").First(&city).Error
 	if err == nil {
 		fmt.Printf("Skipping city '%s' already exists.\n", city.Name)
+		return
 	}
 
 	if err != gorm.ErrRecordNotFound {
