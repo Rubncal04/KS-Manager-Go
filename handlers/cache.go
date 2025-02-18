@@ -21,7 +21,7 @@ func NewCache(cache *db.RedisRepo) echo.MiddlewareFunc {
 			cacheKey := c.Request().RequestURI
 			method := c.Request().Method
 
-			if method == "POST" || method == "PUT" {
+			if method == "POST" || method == "PUT" || method == "DELETE" {
 				cache.DeleteCache(cacheKey)
 			} else {
 				cachedData, err := cache.GetCache(cacheKey)
@@ -42,7 +42,7 @@ func NewCache(cache *db.RedisRepo) echo.MiddlewareFunc {
 				return err
 			}
 
-			if recorder.statusCode == http.StatusOK {
+			if recorder.statusCode == http.StatusOK && (method != "POST" && method != "PUT" && method != "DELETE") {
 				_, err := cache.SetCache(cacheKey, recorder.body.String())
 				if err != nil {
 					log.Printf("Error storing data in cache: %v", err)
